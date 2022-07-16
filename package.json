@@ -1,0 +1,17 @@
+{
+	"name": "myo-hand-rehab",
+	"version": "1.0.0",
+	"description": "Server for Hand Rehab Unity application",
+	"main": "server.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"start": "nodemon server.js"
+	},
+	"author": "Antonio Chaves",
+	"license": "GPL-3.0-or-later",
+	"dependencies": {
+		"express": "^4.18.1",
+		"myo": "^3.0.1",
+		"ws": "^8.8.0"
+	}
+}
