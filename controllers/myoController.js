@@ -32,7 +32,7 @@ class MyoController {
 	}
 
 	EMG(data) {
-		// 200 values per second, so 1000 values equals 1 seconds
+		// 200 values per second, so 20 values equals 0.1 seconds
 		if (this._currentPush > 19) {
 			this._currentPush = 0;
 			this._passed20 = true;
