@@ -9,6 +9,7 @@ const MyoController = require("./controllers/myoController");
 const ServerController = require("./controllers/serverController");
 
 // Myo
+// Required initialization
 Myo.connect("com.stolksdorf.myAwesomeApp", ws);
 
 Myo.on("connected", function () {
@@ -21,7 +22,8 @@ Myo.on("emg", (data) => {
 });
 
 // Routes and gets
-app.get("/strength", ServerController.getStrength(MyoController));
+// Get current Myo's strength
+app.get("/strength", ServerController.getMyoStrength(MyoController));
 
 app.listen(8000, () => {
 	console.log("running");

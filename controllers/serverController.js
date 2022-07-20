@@ -3,7 +3,11 @@ const { getStrength } = require("../util/info");
 class ServerController {
 	constructor() {}
 
-	getStrength(myo) {
+	/**
+	 * Get current Myo's strength
+	 * @param {*} myo - Myo instance
+	 */
+	getMyoStrength(myo) {
 		return (req, res) => {
 			// Get all needed information to evaluate the response
 			const { connected, stream } = myo.info;
