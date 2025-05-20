@@ -1,25 +1,26 @@
-const getAverageEMG = (arrayOfEMG) => {
-	let sum = 0;
-	for (let i = 0; i < arrayOfEMG.length; i++) {
-		sum += getHigherEMG(arrayOfEMG[i]);
-	}
-	const final = Math.round(sum / arrayOfEMG.length);
-	return (final / 100).toFixed(1);
-};
+// --- info.js
+/**
+ * Returns the highest absolute value in one EMG sample (array of numbers).
+ */
+function getHigherEMG(sample) {
+	return Math.max(...sample.map((v) => Math.abs(v)));
+}
 
-const getHigherEMG = (emg) => {
-	let higher = 0;
-	for (let i = 0; i < emg.length; i++) {
-		if (0 > emg[i]) {
-			if (higher < -emg[i]) higher = -emg[i];
-		} else if (higher < emg[i]) higher = emg[i];
-	}
-	return higher;
-};
+/**
+ * Computes a normalized average of the max absolute values across an array of EMG samples.
+ */
+function getAverageEMG(samples) {
+	const total = samples.reduce((sum, s) => sum + getHigherEMG(s), 0);
+	const avg = total / samples.length;
+	return avg / 255; // assuming 8-bit amplitude range
+}
 
-const getStrength = (arrayOfEMG) => {
-	const strength = getAverageEMG(arrayOfEMG) * 1.4;
-	return strength > 1 ? strength * 2 : strength;
-};
+/**
+ * Computes a 'strength' metric from EMG stream: scales average and applies gain.
+ */
+function getStrength(samples) {
+	const normalized = getAverageEMG(samples) * 1.4;
+	return normalized > 1 ? normalized * 2 : normalized;
+}
 
-module.exports = { getStrength };
+module.exports = { getHigherEMG, getAverageEMG, getStrength };

@@ -1,15 +1,13 @@
-// This is the entry point for the application
+// --- server.js
 const express = require("express");
 const app = express();
-
+// Initialize Myo connection and events
 var Myo = require("myo");
 const ws = require("ws");
 
 const MyoController = require("./controllers/myoController");
 const ServerController = require("./controllers/serverController");
 
-// Myo
-// Required initialization
 Myo.connect("com.stolksdorf.myAwesomeApp", ws);
 
 Myo.on("connected", function () {
@@ -17,14 +15,13 @@ Myo.on("connected", function () {
 	MyoController.CONNECT();
 });
 
-Myo.on("emg", (data) => {
+Myo.on("emg", function (data) {
+	// Forward EMG sample to controller
 	MyoController.EMG(data);
 });
 
-// Routes and gets
-// Get current Myo's strength
+// Routes
 app.get("/strength", ServerController.getMyoStrength(MyoController));
+app.get("/customMetric", ServerController.getCustomMetric(MyoController));
 
-app.listen(8000, () => {
-	console.log("running");
-});
+app.listen(8000, () => console.log("Server running on port 8000"));

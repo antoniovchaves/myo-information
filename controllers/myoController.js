@@ -1,69 +1,55 @@
+// --- myoController.js
+// const { getHigherEMG } = require("./info");
+
 class MyoController {
 	constructor() {
 		this._stream = [];
-		this._passed20 = false;
 		this._currentPush = 0;
+		this._passed20 = false;
 		this._connected = false;
+		// count interactions and store per-interaction averages
+		this.interactionCount = 0;
+		this.interactionAverages = [];
 	}
 
+	CONNECT() {
+		this._connected = true;
+		console.log("Connected");
+	}
+
+	EMG(data) {
+		// Increment interaction counter
+		this.interactionCount++;
+
+		// Compute average of top 3 absolute EMG values for this interaction
+		const absValues = data.map((v) => Math.abs(v));
+		absValues.sort((a, b) => b - a);
+		const top3 = absValues.slice(0, 3);
+		const avgTop3 = top3.reduce((sum, v) => sum + v, 0) / top3.length;
+		this.interactionAverages.push(avgTop3);
+
+		// Existing circular-buffer logic
+		if (this._passed20) {
+			this._streamChange(data);
+		} else {
+			this._streamPush(data);
+			if (this._stream.length === 20) {
+				this._passed20 = true;
+			}
+		}
+		this._currentPush = (this._currentPush + 1) % 20;
+	}
+
+	/** Expose internal state plus new metrics */
 	get info() {
 		return {
 			stream: this._stream,
 			passed20: this._passed20,
 			currentPush: this._currentPush,
 			connected: this._connected,
+			interactionCount: this.interactionCount,
+			interactionAverages: this.interactionAverages,
 		};
-	}
-
-	/** @internal
-	 * Clones _stream and push the item to end of cloned stream.
-	 * @param {Array} item with values between -100 and 100 each element got from Myo's EMG
-	 * @returns Array with pushed values
-	 */
-	_streamPush(item) {
-		const stream = this._stream;
-		stream.push(item);
-		return stream;
-	}
-
-	/** @internal
-	 * Clones _stream and rewrite it on to _currentPush index with the item parameter.
-	 * @param {Array} item  with values between -100 and 100 each element got from Myo's EMG
-	 * @returns Array with changed values
-	 */
-	_streamChange(item) {
-		const stream = this._stream;
-		stream[this._currentPush] = item;
-		return stream;
-	}
-
-	/**
-	 * Changes _connected to true and logs
-	 */
-	CONNECT() {
-		this._connected = true;
-		console.log("Connected");
-	}
-
-	/**
-	 * Fill _stream depending on the situation:
-	 *  - If full: rewrite Array on _currentPush index position;
-	 *  - Else: push new EMG information to _stream
-	 *
-	 * @param {Array} data with values between -100 and 100 each element got from Myo's EMG
-	 */
-	EMG(data) {
-		// 200 values per second, so 20 values equals 0.1 seconds
-		if (this._currentPush > 19) {
-			this._currentPush = 0;
-			this._passed20 = true;
-		}
-
-		if (this._passed20) {
-			this._stream = this._streamChange(data);
-		} else this._stream = this._streamPush(data);
-
-		this._currentPush++;
 	}
 }
 
