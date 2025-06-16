@@ -4,6 +4,7 @@ class MyoController {
 		this._passed20 = false;
 		this._currentPush = 0;
 		this._connected = false;
+		this._arm;
 	}
 
 	get info() {
@@ -64,6 +65,12 @@ class MyoController {
 		} else this._stream = this._streamPush(data);
 
 		this._currentPush++;
+		// console.log(this._stream)
+	}
+
+	ARM_SYNCED(arm) {
+		this._arm = arm;
+		console.log(`Arm detected: ${arm}`);
 	}
 }
 
