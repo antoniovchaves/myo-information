@@ -11,17 +11,21 @@ const ServerController = require("./controllers/serverController");
 Myo.connect("com.stolksdorf.myAwesomeApp", ws);
 
 Myo.on("connected", function () {
-	this.streamEMG(true);
-	MyoController.CONNECT();
+    this.streamEMG(true);
+    MyoController.CONNECT();
 });
 
 Myo.on("emg", function (data) {
-	// Forward EMG sample to controller
-	MyoController.EMG(data);
+    // Forward EMG sample to controller
+    MyoController.EMG(data);
 });
 
 // Routes
 app.get("/strength", ServerController.getMyoStrength(MyoController));
 app.get("/customMetric", ServerController.getCustomMetric(MyoController));
+app.get(
+    "/passive-strength",
+    ServerController.getPassiveStrength(MyoController)
+);
 
 app.listen(8000, () => console.log("Server running on port 8000"));
